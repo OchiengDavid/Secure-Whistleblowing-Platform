@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div style="background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    <h2>🔓 Evidence Decryption Portal</h2>
+    <hr>
+    <p><strong>Report ID:</strong> {{ report.id }}</p>
+    <p><strong>Subject:</strong> {{ report.subject }}</p>
+
+    {% if decrypted_img %}
+        <h3 style="color: #28a745;">Success! Evidence Unlocked:</h3>
+        <div style="margin-top: 20px;">
+            <img src="{{ decrypted_img }}" style="max-width: 100%; border: 5px solid #eee; border-radius: 5px;">
+        </div>
+        <p style="margin-top: 10px;"><a href="{{ report.attachment.url }}" download>Download Decrypted File</a></p>
+    {% else %}
+        {% if error %}
+            <div style="color: white; background: #dc3545; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="post" style="background: #f8f9fa; padding: 20px; border-radius: 5px;">
+            {% csrf_token %}
+            <label><strong>Enter Private Key (Hex format):</strong></label><br>
+            <input type="password" name="private_key" placeholder="Paste your 64-character hex key here..." 
+                   style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 4px;">
+            <br>
+            <button type="submit" class="default" style="background: #c1121f; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold;">
+                UNLOCK EVIDENCE
+            </button>
+        </form>
+    {% endif %}
+
+    <br>
+    <a href="../../">⬅ Back to Reports List</a>
+</div>
+{% endblock %}
