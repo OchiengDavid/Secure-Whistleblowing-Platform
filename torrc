@@ -1,2 +1,2 @@
-HiddenServiceDir C:\Users\hp\Desktop\Secure Whistleblower System\Secure-Whistleblowing-Platform\tor_data
+HiddenServiceDir C:\Users\hp\Desktop\Secure Whistleblower\Secure-Whistleblowing-Platform\tor_data
 HiddenServicePort 80 127.0.0.1:8000
