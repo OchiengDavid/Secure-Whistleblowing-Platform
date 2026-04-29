@@ -9,10 +9,19 @@ from .models import AnonymousReport
 
 @admin.register(AnonymousReport)
 class AnonymousReportAdmin(admin.ModelAdmin):
-    list_display = ('id', 'subject', 'submitted_at', 'encryption_status_label', 'unlock_link')
-    readonly_fields = ('submitted_at', 'encryption_status_label')
+    # Added 'status_token' and 'status' to the list view for easy tracking
+    list_display = ('id', 'status_token', 'subject', 'status', 'submitted_at', 'encryption_status_label', 'unlock_link')
+    
+    # We make the token and date readonly so they can't be accidentally changed
+    readonly_fields = ('submitted_at', 'status_token', 'encryption_status_label')
+    
+    list_filter = ('status', 'submitted_at')
+    search_fields = ('status_token', 'subject')
 
-    # 1. This adds a button to the list view
+    # 'status' and 'admin_feedback' are included here so you can edit them and reply to the user
+    fields = ('status_token', 'status', 'admin_feedback', 'subject', 'content', 'attachment', 'submitted_at')
+
+    # --- ORIGINAL METHODS PRESERVED ---
     def unlock_link(self, obj):
         if obj.attachment and 'enc_' in obj.attachment.name:
             return mark_safe(f'<a class="button" href="{obj.id}/decrypt/">🔓 Open Portal</a>')
@@ -24,7 +33,6 @@ class AnonymousReportAdmin(admin.ModelAdmin):
             return mark_safe('<b style="color: #28a745;">🔒 SECURED</b>')
         return mark_safe('<b style="color: #dc3545;">⚠️ UNSECURED</b>')
 
-    # 2. This creates the secret URL for the decryption box
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -32,7 +40,6 @@ class AnonymousReportAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
-    # 3. This is the logic for the "Box"
     def decrypt_view(self, request, object_id):
         obj = self.get_object(request, object_id)
         decrypted_img = None
@@ -41,17 +48,21 @@ class AnonymousReportAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             private_key_hex = request.POST.get('private_key')
             try:
-                # Setup NaCl
                 priv_key = nacl.public.PrivateKey(private_key_hex, nacl.encoding.HexEncoder)
                 sealed_box = nacl.public.SealedBox(priv_key)
                 
-                # Decrypt
                 encrypted_data = obj.attachment.read()
                 raw_data = sealed_box.decrypt(encrypted_data)
                 
-                # Encode for browser display
                 encoded_img = base64.b64encode(raw_data).decode('utf-8')
-                decrypted_img = f"data:image/png;base64,{encoded_img}"
+                
+                fname = obj.attachment.name.lower()
+                if ".mp3" in fname:
+                    mime = "data:audio/mpeg;base64,"
+                else:
+                    mime = "data:image/png;base64,"
+                    
+                decrypted_img = f"{mime}{encoded_img}"
             except Exception:
                 error = "Invalid Private Key! Access Denied."
 

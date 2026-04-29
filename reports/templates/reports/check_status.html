@@ -1,0 +1,24 @@
+{% block content %}
+<div style="max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    <h2>🔍 Check Case Status</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="token" placeholder="Enter your 8-character token" required 
+               style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #ddd;">
+        <button type="submit" style="width: 100%; background: #c1121f; color: white; padding: 10px; border: none; cursor: pointer;">
+            VIEW STATUS
+        </button>
+    </form>
+
+    {% if report %}
+        <hr>
+        <div style="background: #e9ecef; padding: 15px; border-radius: 5px;">
+            <p><strong>Status:</strong> <span style="color: blue;">{{ report.status }}</span></p>
+            <p><strong>Admin Feedback:</strong></p>
+            <p>{{ report.admin_feedback|default:"No feedback yet. Please check back later." }}</p>
+        </div>
+    {% elif error %}
+        <p style="color: red; margin-top: 10px;">{{ error }}</p>
+    {% endif %}
+</div>
+{% endblock %}

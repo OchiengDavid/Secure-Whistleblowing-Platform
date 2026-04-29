@@ -6,82 +6,54 @@
     <title>Submit Anonymous Report</title>
     <style>
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+            margin: 0; padding: 0; height: 100%;
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
         .container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
+            background-color: white; padding: 40px; border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
+            max-width: 600px; width: 100%; text-align: center;
         }
-        h2 {
-            color: #007bff;
-            margin-bottom: 20px;
+        h2 { color: #007bff; margin-bottom: 20px; }
+        .error-box {
+            background-color: #ffebee; color: #c62828;
+            padding: 15px; border-radius: 5px; margin-bottom: 20px;
+            border: 1px solid #ef9a9a; text-align: left; font-size: 14px;
         }
-        p {
-            color: #666;
-            margin-bottom: 30px;
-        }
-        form {
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
+        form { text-align: left; }
         input[type="text"], textarea, input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        textarea {
-            height: 150px;
-            resize: vertical;
+            width: 100%; padding: 10px; margin-bottom: 20px;
+            border: 1px solid #ddd; border-radius: 5px;
         }
         button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 5px;
-            width: 100%;
+            background-color: #007bff; color: white; border: none;
+            padding: 15px; font-size: 18px; cursor: pointer;
+            border-radius: 5px; width: 100%; font-weight: bold;
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        hr {
-            margin: 30px 0;
-            border: none;
-            border-top: 1px solid #eee;
-        }
+        button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Submit Anonymous Report</h2>
-        <p>Your identity is protected.</p>
+        <p>Your identity is protected by zero-knowledge encryption.</p>
+
+        {% if error %}
+        <div class="error-box">
+            <strong>⚠️ Submission Error:</strong><br>
+            {{ error }}
+        </div>
+        {% endif %}
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            
+            {# Django renders the Subject, Content, and Attachment fields here #}
             {{ form.as_p }}
-            <hr>
+            
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
             <button type="submit">Submit Securely</button>
         </form>
     </div>

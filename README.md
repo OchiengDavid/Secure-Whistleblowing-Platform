@@ -126,6 +126,23 @@ sudo cat /var/lib/tor/hidden_service/hostname
 ### 5. Access via Tor Browser
 Open Tor Browser and navigate to the `.onion` address obtained in step 4.
 
+### Optional: Use Nginx as a reverse proxy
+If you want Tor to connect through Nginx instead of directly to Django, use this configuration:
+
+- run Django on `127.0.0.1:8000`
+- use `nginx_tor.conf` from the project root
+- configure Tor with:
+```bash
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 127.0.0.1:80
+```
+- restart Tor and nginx
+
+If you do not use nginx, keep the existing Tor mapping:
+```bash
+HiddenServicePort 80 127.0.0.1:8000
+```
+
 ## Dependencies
 
 - **Django 6.0.4**: Web framework

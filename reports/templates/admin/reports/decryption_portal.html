@@ -2,22 +2,52 @@
 {% block content %}
 <div style="background: #f4f4f4; padding: 20px; border: 1px solid #ccc;">
     <h2>Security Decryption Portal</h2>
-    <p>File: {{ report.attachment.name }}</p>
+    <p><strong>File Name:</strong> {{ report.attachment.name }}</p>
 
     {% if decrypted_img %}
         <h3 style="color: green;">Evidence Decrypted Successfully:</h3>
-        <img src="{{ decrypted_img }}" style="max-width: 500px; border: 3px solid #28a745;">
+        
+        <div style="margin: 20px 0; padding: 15px; background: white; border-radius: 8px; display: inline-block;">
+            
+            {# 1. CHECK IF AUDIO (MP3) #}
+            {% if ".mp3" in report.attachment.name.lower %}
+                <p><strong>Audio Evidence Detected:</strong></p>
+                <audio controls style="width: 100%; min-width: 400px;">
+                    <source src="{{ decrypted_img }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+
+            {# 2. CHECK IF IMAGE #}
+            {% elif ".png" in report.attachment.name.lower or ".jpg" in report.attachment.name.lower or ".jpeg" in report.attachment.name.lower %}
+                <p> <strong>Image Evidence Detected:</strong></p>
+                <img src="{{ decrypted_img }}" style="max-width: 600px; border: 3px solid #28a745; border-radius: 4px;">
+
+            {# 3. FALLBACK FOR OTHER FILES #}
+            {% else %}
+                <p><strong>Encrypted Data:</strong> Preview not available for this file type.</p>
+            {% endif %}
+
+            <div style="margin-top: 15px;">
+                <a href="{{ decrypted_img }}" download="decrypted_evidence" style="text-decoration: none; color: #007bff; font-weight: bold;">
+                     Download Decrypted File
+                </a>
+            </div>
+        </div>
+
     {% else %}
-        {% if error %}<p style="color: red;">{{ error }}</p>{% endif %}
+        {% if error %}<p style="color: red; font-weight: bold;"> {{ error }}</p>{% endif %}
+        
         <form method="post">
             {% csrf_token %}
             <p>Enter Officer Private Key (Hex) to unlock this evidence:</p>
-            <input type="password" name="private_key" style="width: 100%; max-width: 500px; padding: 10px;">
+            <p style="font-size: 0.85em; color: #666;">Note: This key is never stored on the server.</p>
+            <input type="password" name="private_key" style="width: 100%; max-width: 500px; padding: 10px; border: 1px solid #999;">
             <br><br>
-            <input type="submit" value="Unlock Evidence" class="default" style="background: #c1121f; color: white; padding: 10px 20px; border: none; cursor: pointer;">
+            <input type="submit" value="Unlock Evidence" class="default" style="background: #c1121f; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold;">
         </form>
     {% endif %}
+    
     <br><br>
-    <a href="..">← Back to List</a>
+    <a href=".." style="color: #666;">← Back to List</a>
 </div>
 {% endblock %}

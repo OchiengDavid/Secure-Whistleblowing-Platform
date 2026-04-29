@@ -1,9 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head><title>Success</title></head>
-<body>
-    <h1>Report Submitted Securely</h1>
-    <p>Your metadata has been stripped and your report has been stored in our encrypted database.</p>
-    <a href="/">Submit another report</a>
-</body>
-</html>
+{% block content %}
+<div style="text-align: center; padding: 50px;">
+    <h2 style="color: #28a745;">✅ Report Submitted Successfully!</h2>
+    <p>Your report has been encrypted and safely stored.</p>
+    
+    <div style="background: #f8f9fa; border: 2px dashed #c1121f; padding: 20px; display: inline-block; margin: 20px 0;">
+        <p style="margin-bottom: 5px;"><strong>YOUR STATUS TOKEN:</strong></p>
+        <h1 style="letter-spacing: 5px; color: #c1121f;">{{ token }}</h1>
+        <p style="font-size: 0.8em; color: #666;">⚠️ Save this token! You cannot recover it if lost.</p>
+    </div>
+    <br>
+    <a href="{% url 'landing_page' %}" class="button">Return Home</a>
+</div>
+{% endblock %}

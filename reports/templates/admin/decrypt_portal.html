@@ -1,37 +1,61 @@
 {% extends "admin/base_site.html" %}
 {% block content %}
-<div style="background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+<div style="background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px; max-width: 800px; margin: 20px auto;">
     <h2>🔓 Evidence Decryption Portal</h2>
     <hr>
     <p><strong>Report ID:</strong> {{ report.id }}</p>
     <p><strong>Subject:</strong> {{ report.subject }}</p>
 
     {% if decrypted_img %}
-        <h3 style="color: #28a745;">Success! Evidence Unlocked:</h3>
-        <div style="margin-top: 20px;">
-            <img src="{{ decrypted_img }}" style="max-width: 100%; border: 5px solid #eee; border-radius: 5px;">
+        <h3 style="color: #28a745;">✅ Success! Evidence Unlocked:</h3>
+        
+        <div style="margin-top: 20px; padding: 15px; border: 2px dashed #ccc; border-radius: 10px; background: #f9f9f9;">
+            {% if ".mp3" in report.attachment.name.lower %}
+                <div style="text-align: center; padding: 20px;">
+                    <p style="font-size: 1.2em;">🎵 Audio Evidence</p>
+                    <audio controls style="width: 100%;">
+                        <source src="{{ decrypted_img }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            {% else %}
+                <div style="text-align: center;">
+                    <img src="{{ decrypted_img }}" style="max-width: 100%; border: 5px solid #eee; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                </div>
+            {% endif %}
         </div>
-        <p style="margin-top: 10px;"><a href="{{ report.attachment.url }}" download>Download Decrypted File</a></p>
+
+        <p style="margin-top: 20px; text-align: center;">
+            <a href="{{ decrypted_img }}" 
+               download="decrypted_{{ report.id }}{% if '.mp3' in report.attachment.name.lower %}.mp3{% else %}.png{% endif %}" 
+               style="background: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+               📥 Download Decrypted Evidence
+            </a>
+        </p>
+
     {% else %}
         {% if error %}
-            <div style="color: white; background: #dc3545; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                {{ error }}
+            <div style="color: white; background: #dc3545; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-weight: bold;">
+                ⚠️ {{ error }}
             </div>
         {% endif %}
 
-        <form method="post" style="background: #f8f9fa; padding: 20px; border-radius: 5px;">
+        <form method="post" style="background: #f8f9fa; padding: 25px; border-radius: 5px; border: 1px solid #dee2e6;">
             {% csrf_token %}
-            <label><strong>Enter Private Key (Hex format):</strong></label><br>
+            <label style="font-size: 1.1em;"><strong>Enter Private Key (Hex format):</strong></label><br>
+            <p style="color: #666; font-size: 0.9em;">This key is required to decrypt the whistleblower's attachment.</p>
             <input type="password" name="private_key" placeholder="Paste your 64-character hex key here..." 
-                   style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 4px;">
+                   style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 4px; font-family: monospace;">
             <br>
-            <button type="submit" class="default" style="background: #c1121f; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold;">
+            <button type="submit" class="default" style="background: #c1121f; color: white; padding: 12px 30px; border: none; cursor: pointer; font-weight: bold; width: 100%; border-radius: 4px; font-size: 1em;">
                 UNLOCK EVIDENCE
             </button>
         </form>
     {% endif %}
 
     <br>
-    <a href="../../">⬅ Back to Reports List</a>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="../../" style="color: #666; text-decoration: none;">⬅ Back to Reports List</a>
+    </div>
 </div>
 {% endblock %}
