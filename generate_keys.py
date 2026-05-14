@@ -33,26 +33,26 @@ def generate_keys():
     return private_hex, public_hex
 
 if __name__ == "__main__":
-    print("🔐 SafeReport Encryption Key Generator")
+    print("SafeReport Encryption Key Generator")
     print("=" * 50)
 
     private_key, public_key = generate_keys()
 
-    print("\n✅ Keys generated successfully!")
-    print("\n📋 Add these to your environment variables:")
+    print("\n Keys generated successfully!")
+    print("\n Add these to your environment variables:")
     print(f"\nOFFICER_PUBLIC_KEY={public_key}")
     print(f"OFFICER_PRIVATE_KEY={private_key}")
 
-    print("\n⚠️  IMPORTANT SECURITY NOTES:")
+    print("\n  IMPORTANT SECURITY NOTES:")
     print("- Store the OFFICER_PRIVATE_KEY securely and privately")
     print("- Only authorized personnel should have access to the private key")
     print("- The public key can be safely shared with the Django application")
     print("- Keep backups of both keys in secure locations")
 
-    print("\n🔄 To regenerate keys (will invalidate all previously encrypted files):")
+    print("\n To regenerate keys (will invalidate all previously encrypted files):")
     print("   Run this script again")
 
-    print("\n📁 For Django settings, you can also add to settings.py:")
+    print("\n For Django settings, you can also add to settings.py:")
     print("import os")
     print(f"os.environ['OFFICER_PUBLIC_KEY'] = '{public_key}'")
     print(f"os.environ['OFFICER_PRIVATE_KEY'] = '{private_key}'")

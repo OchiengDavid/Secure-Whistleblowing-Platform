@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Officer Dashboard</title>
+</head>
+<body>
+<h2>Officer Dashboard</h2>
+<p>Logged in as {{ request.user.username }} | <a href="/officer/logout/">Logout</a></p>
+
+<!-- Status filter -->
+<form method="GET">
+    <label>Filter by status:</label>
+    <select name="status" onchange="this.form.submit()">
+        <option value="">All</option>
+        {% for s in statuses %}
+        <option value="{{ s }}" {% if active_filter == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<hr>
+<p>{{ reports.count }} report(s)</p>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>{{ report.status_token }}</td>
+            <td>{{ report.subject }}</td>
+            <td>{{ report.status }}</td>
+            <td>{{ report.submitted_at|date:"d M Y, H:i" }}</td>
+            <td><a href="/officer/decrypt/{{ report.id }}/">🔓 Decrypt</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No reports found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

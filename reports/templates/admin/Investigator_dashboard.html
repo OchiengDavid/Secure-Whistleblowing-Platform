@@ -1,0 +1,50 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .results-table th, .results-table td { padding: 12px; border-bottom: 1px solid #ccc; text-align: left; }
+    .status-badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+    .pending { background: #fff3cd; color: #856404; }
+    .btn-open { background: #79aec8; color: white !important; padding: 8px 15px; border-radius: 4px; text-decoration: none; }
+    .btn-open:hover { background: #417690; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Investigator Overview</h1>
+    <p>Logged in as: <strong>{{ user.username }}</strong> (MFA Verified 🔒)</p>
+
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Submitted At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.id }}</td>
+                <td>{{ report.subject }}</td>
+                <td><span class="status-badge pending">{{ report.status }}</span></td>
+                <td>{{ report.submitted_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="../{{ report.id }}/decrypt/" class="btn-open">🔓 Open Portal</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No anonymous reports found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -7,7 +7,6 @@ def seal_report(message_text):
     Takes plain text and returns an encrypted blob using the Public Key.
     """
     # 1. Locate the Public Key
-    # We assume it's in your main project folder
     key_path = os.path.join(settings.BASE_DIR, 'Secure-Whistleblowing-Platform', 'public_key.key')
     
     # If the path above is tricky, you can also use a simple relative path for now:

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Decrypt Report</title>
+</head>
+<body>
+<p><a href="/officer/dashboard/">← Back to Dashboard</a> | <a href="/officer/logout/">Logout</a></p>
+
+<h2>Report: {{ report.subject }}</h2>
+<p><strong>Token:</strong> {{ report.status_token }}</p>
+<p><strong>Status:</strong> {{ report.status }}</p>
+<p><strong>Submitted:</strong> {{ report.submitted_at }}</p>
+<p><strong>Report Text:</strong> {{ report.content }}</p>
+
+<hr>
+<h3>Decrypt Attachment</h3>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+{% if not decrypted_content %}
+<form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="decrypt">
+    <label>Private Key (hex):</label><br>
+    <input type="password" name="private_key" style="width:500px;" 
+           placeholder="Paste your 64-character hex private key..." required><br><br>
+    <button type="submit">Decrypt</button>
+</form>
+{% else %}
+<p style="color:green;">✓ Decryption successful</p>
+
+{% if "image" in decrypted_content %}
+    <img src="{{ decrypted_content }}" style="max-width:100%;" alt="Decrypted evidence">
+{% elif "audio" in decrypted_content %}
+    <audio controls><source src="{{ decrypted_content }}"></audio>
+{% elif "pdf" in decrypted_content %}
+    <iframe src="{{ decrypted_content }}" style="width:100%;height:600px;"></iframe>
+{% else %}
+    <a href="{{ decrypted_content }}" download="evidence">Download File</a>
+{% endif %}
+
+<!-- Decrypt again with different key -->
+<form method="POST" style="margin-top:1rem;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="decrypt">
+    <input type="password" name="private_key" placeholder="Try a different key..." style="width:400px;">
+    <button type="submit">Re-decrypt</button>
+</form>
+{% endif %}
+
+<hr>
+<h3>Update Status & Feedback</h3>
+<form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="update">
+    <label>Status:</label><br>
+    <input type="text" name="status" value="{{ report.status }}"><br><br>
+    <label>Feedback to whistleblower:</label><br>
+    <textarea name="admin_feedback" rows="4" cols="60">{{ report.admin_feedback|default:'' }}</textarea><br><br>
+    <button type="submit">Save Update</button>
+</form>
+</body>
+</html>

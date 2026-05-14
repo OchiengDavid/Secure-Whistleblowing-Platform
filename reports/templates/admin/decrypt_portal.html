@@ -1,61 +1,95 @@
 {% extends "admin/base_site.html" %}
 {% block content %}
-<div style="background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px; max-width: 800px; margin: 20px auto;">
-    <h2>🔓 Evidence Decryption Portal</h2>
-    <hr>
-    <p><strong>Report ID:</strong> {{ report.id }}</p>
-    <p><strong>Subject:</strong> {{ report.subject }}</p>
+<style>
+  .decrypt-wrap { max-width: 780px; margin: 0 auto; font-family: 'IBM Plex Mono', monospace, sans-serif; }
+  .card { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .card h2 { font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; color: #00d4ff; margin-bottom: 1rem; border-bottom: 1px solid #2a2a4a; padding-bottom: 0.6rem; }
+  .meta { font-size: 0.8rem; color: #aaa; margin-bottom: 0.4rem; }
+  .meta span { color: #fff; }
+  label { display: block; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; margin-bottom: 0.4rem; margin-top: 1rem; }
+  input[type=text], input[type=password] { width: 100%; background: #0d0d1a; border: 1px solid #2a2a4a; border-radius: 4px; color: #e8edf5; font-family: inherit; font-size: 0.85rem; padding: 0.65rem 1rem; outline: none; }
+  input:focus { border-color: #00d4ff; }
+  .btn { display: inline-block; background: #00d4ff; color: #000; border: none; border-radius: 4px; padding: 0.65rem 1.5rem; font-family: inherit; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; margin-top: 1rem; }
+  .btn:hover { background: #00b8d9; }
+  .btn-back { background: transparent; border: 1px solid #2a2a4a; color: #aaa; margin-right: 0.5rem; }
+  .alert-error { background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.3); color: #ff8a80; padding: 0.8rem 1rem; border-radius: 4px; font-size: 0.82rem; margin-bottom: 1rem; }
+  .alert-success { background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.25); color: #00e676; padding: 0.8rem 1rem; border-radius: 4px; font-size: 0.82rem; margin-bottom: 1rem; }
+  .decrypted-text { background: #0d0d1a; border: 1px solid rgba(0,230,118,0.25); border-left: 3px solid #00e676; border-radius: 0 4px 4px 0; padding: 1rem 1.2rem; font-size: 0.85rem; line-height: 1.8; color: #e8edf5; white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto; margin-top: 1rem; }
+  .decrypted-image { max-width: 100%; border-radius: 4px; margin-top: 1rem; border: 1px solid #2a2a4a; }
+  audio { width: 100%; margin-top: 1rem; }
+</style>
 
-    {% if decrypted_img %}
-        <h3 style="color: #28a745;">✅ Success! Evidence Unlocked:</h3>
-        
-        <div style="margin-top: 20px; padding: 15px; border: 2px dashed #ccc; border-radius: 10px; background: #f9f9f9;">
-            {% if ".mp3" in report.attachment.name.lower %}
-                <div style="text-align: center; padding: 20px;">
-                    <p style="font-size: 1.2em;">🎵 Audio Evidence</p>
-                    <audio controls style="width: 100%;">
-                        <source src="{{ decrypted_img }}" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-            {% else %}
-                <div style="text-align: center;">
-                    <img src="{{ decrypted_img }}" style="max-width: 100%; border: 5px solid #eee; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                </div>
-            {% endif %}
-        </div>
+<div class="decrypt-wrap">
+  <h1 style="color:#00d4ff; font-size:1.1rem; margin-bottom:1.5rem;">🔓 Secure Decryption Portal</h1>
 
-        <p style="margin-top: 20px; text-align: center;">
-            <a href="{{ decrypted_img }}" 
-               download="decrypted_{{ report.id }}{% if '.mp3' in report.attachment.name.lower %}.mp3{% else %}.png{% endif %}" 
-               style="background: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-               📥 Download Decrypted Evidence
-            </a>
-        </p>
+  <!-- Report metadata -->
+  <div class="card">
+    <h2>Report Information</h2>
+    <div class="meta">Token: <span>{{ report.status_token }}</span></div>
+    <div class="meta">Subject: <span>{{ report.subject }}</span></div>
+    <div class="meta">Status: <span>{{ report.status }}</span></div>
+    <div class="meta">Submitted: <span>{{ report.submitted_at }}</span></div>
+  </div>
 
-    {% else %}
-        {% if error %}
-            <div style="color: white; background: #dc3545; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-weight: bold;">
-                ⚠️ {{ error }}
-            </div>
-        {% endif %}
+  <!-- Key input form -->
+  <div class="card">
+    <h2>Enter Private Key to Decrypt</h2>
 
-        <form method="post" style="background: #f8f9fa; padding: 25px; border-radius: 5px; border: 1px solid #dee2e6;">
-            {% csrf_token %}
-            <label style="font-size: 1.1em;"><strong>Enter Private Key (Hex format):</strong></label><br>
-            <p style="color: #666; font-size: 0.9em;">This key is required to decrypt the whistleblower's attachment.</p>
-            <input type="password" name="private_key" placeholder="Paste your 64-character hex key here..." 
-                   style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 4px; font-family: monospace;">
-            <br>
-            <button type="submit" class="default" style="background: #c1121f; color: white; padding: 12px 30px; border: none; cursor: pointer; font-weight: bold; width: 100%; border-radius: 4px; font-size: 1em;">
-                UNLOCK EVIDENCE
-            </button>
-        </form>
+    {% if error %}
+    <div class="alert-error">{{ error }}</div>
     {% endif %}
 
-    <br>
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="../../" style="color: #666; text-decoration: none;">⬅ Back to Reports List</a>
-    </div>
+    {% if decrypted_content or decrypted_text %}
+    <div class="alert-success">✓ Decryption successful</div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <label for="private_key">Your NaCl Private Key (hex)</label>
+      <input type="password" name="private_key" id="private_key"
+        placeholder="Paste your 64-character hex private key…"
+        autocomplete="off" autocorrect="off" spellcheck="false" required>
+      <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+        <a href="../" class="btn btn-back">← Back</a>
+        <button type="submit" class="btn">Decrypt Report</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Decrypted output -->
+  {% if decrypted_text %}
+  <div class="card">
+    <h2>Decrypted Report Text</h2>
+    <div class="decrypted-text">{{ decrypted_text }}</div>
+  </div>
+  {% endif %}
+
+  {% if decrypted_content %}
+  <div class="card">
+    <h2>Decrypted Attachment</h2>
+    {% if "audio" in decrypted_content %}
+      <audio controls><source src="{{ decrypted_content }}"></audio>
+    {% elif "image" in decrypted_content %}
+      <img src="{{ decrypted_content }}" class="decrypted-image" alt="Decrypted evidence">
+    {% elif "pdf" in decrypted_content %}
+      <iframe src="{{ decrypted_content }}" style="width:100%;height:500px;border:none;margin-top:1rem;"></iframe>
+    {% else %}
+      <a href="{{ decrypted_content }}" download="evidence" class="btn" style="margin-top:0.5rem;">⬇ Download File</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Admin feedback form -->
+  <div class="card">
+    <h2>Update Status & Send Feedback</h2>
+    <form method="POST" action="../../{{ report.id }}/change/">
+      {% csrf_token %}
+      <label for="status">Case Status</label>
+      <input type="text" name="status" id="status" value="{{ report.status }}" placeholder="e.g. Under Review, Resolved, Closed">
+      <label for="admin_feedback">Feedback to Whistleblower</label>
+      <input type="text" name="admin_feedback" id="admin_feedback" value="{{ report.admin_feedback|default:'' }}" placeholder="Write a response visible on their dashboard…">
+      <button type="submit" class="btn" style="background:#00e676;color:#000;">Save Update</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

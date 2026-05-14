@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Secure Decryption Portal</h1>
+<p>Report ID: {{ report.id }} | Subject: {{ report.subject }}</p>
+
+<hr>
+
+{% if decrypted_img %}
+    <h3>Decrypted Evidence:</h3>
+    <img src="{{ decrypted_img }}" style="max-width: 100%; border: 2px solid #000;">
+{% else %}
+    {% if error %}
+        <p style="color: red; font-weight: bold;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" action="">
+        {% csrf_token %} <div class="form-row">
+            <label for="id_key">Private Key (Hex Format):</label><br>
+            <textarea name="private_key" id="id_key" rows="3" style="width: 100%;" required></textarea>
+        </div>
+        <br>
+        <button type="submit" class="button" style="background: #417690; color: white; padding: 10px 20px;">
+            Decrypt File
+        </button>
+    </form>
+{% endif %}
+
+<br>
+<a href="{% url 'admin:investigator_dashboard' %}">⬅ Back to Dashboard</a>
+{% endblock %}
